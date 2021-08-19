@@ -1,3 +1,11 @@
+```python
+# 自动计算cell的计算时间
+%load_ext autotime
+
+%matplotlib inline
+%config InlineBackend.figure_format='svg' #矢量图设置，让绘图更清晰
+```
+
 # 3-3,高阶API示范
 
 Pytorch没有官方的高阶API，一般需要用户自己实现训练循环、验证循环、和预测循环。
@@ -26,7 +34,6 @@ def printbar():
 
 #mac系统上pytorch和matplotlib在jupyter中同时跑需要更改环境变量
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE" 
-
 ```
 
 ### 一，线性回归模型
@@ -54,7 +61,6 @@ X = 10*torch.rand([n,2])-5.0  #torch.rand是均匀分布
 w0 = torch.tensor([[2.0],[-3.0]])
 b0 = torch.tensor([[10.0]])
 Y = X@w0 + b0 + torch.normal( 0.0,2.0,size = [n,1])  # @表示矩阵乘法,增加正态扰动
-
 ```
 
 ```python
@@ -76,10 +82,7 @@ ax2.legend()
 plt.xlabel("x2")
 plt.ylabel("y",rotation = 0)
 plt.show()
-
 ```
-
-![](./data/3-3-回归数据可视化.png)
 
 ```python
 #构建输入数据管道
@@ -87,11 +90,6 @@ ds = TensorDataset(X,Y)
 ds_train,ds_valid = torch.utils.data.random_split(ds,[int(400*0.7),400-int(400*0.7)])
 dl_train = DataLoader(ds_train,batch_size = 10,shuffle=True,num_workers=2)
 dl_valid = DataLoader(ds_valid,batch_size = 10,num_workers=2)
-
-```
-
-```python
-
 ```
 
 **2，定义模型**
@@ -108,32 +106,10 @@ class LinearRegression(Model):
         return self.fc(x)
 
 model = LinearRegression()
-
 ```
 
 ```python
 model.summary(input_shape = (2,))
-```
-
-```
-----------------------------------------------------------------
-        Layer (type)               Output Shape         Param #
-================================================================
-            Linear-1                    [-1, 1]               3
-================================================================
-Total params: 3
-Trainable params: 3
-Non-trainable params: 0
-----------------------------------------------------------------
-Input size (MB): 0.000008
-Forward/backward pass size (MB): 0.000008
-Params size (MB): 0.000011
-Estimated Total Size (MB): 0.000027
-----------------------------------------------------------------
-```
-
-```python
-
 ```
 
 **3，训练模型**
@@ -153,58 +129,6 @@ model.compile(loss_func = nn.MSELoss(),
               metrics_dict={"mae":mean_absolute_error,"mape":mean_absolute_percent_error})
 
 dfhistory = model.fit(200,dl_train = dl_train, dl_val = dl_valid,log_step_freq = 20)
-
-```
-
-```
-Start Training ...
-
-================================================================================2020-07-05 23:07:25
-{'step': 20, 'loss': 226.768, 'mae': 12.198, 'mape': 1.212}
-
- +-------+---------+-------+-------+----------+---------+----------+
-| epoch |   loss  |  mae  |  mape | val_loss | val_mae | val_mape |
-+-------+---------+-------+-------+----------+---------+----------+
-|   1   | 230.773 | 12.41 | 1.394 | 223.262  |  12.582 |  1.095   |
-+-------+---------+-------+-------+----------+---------+----------+
-
-================================================================================2020-07-05 23:07:26
-{'step': 20, 'loss': 200.964, 'mae': 11.584, 'mape': 1.382}
-
- +-------+---------+--------+------+----------+---------+----------+
-| epoch |   loss  |  mae   | mape | val_loss | val_mae | val_mape |
-+-------+---------+--------+------+----------+---------+----------+
-|   2   | 206.238 | 11.759 | 1.26 | 199.669  |  11.895 |  1.012   |
-+-------+---------+--------+------+----------+---------+----------+
-
-================================================================================2020-07-05 23:07:26
-{'step': 20, 'loss': 188.247, 'mae': 11.387, 'mape': 1.172}
-
- +-------+---------+--------+-------+----------+---------+----------+
-| epoch |   loss  |  mae   |  mape | val_loss | val_mae | val_mape |
-+-------+---------+--------+-------+----------+---------+----------+
-|   3   | 185.185 | 11.177 | 1.189 | 178.112  |  11.24  |  0.952   |
-+-------+---------+--------+-------+----------+---------+----------+
-================================================================================2020-07-05 23:07:59
-{'step': 20, 'loss': 4.14, 'mae': 1.677, 'mape': 1.845}
-
- +-------+-------+-------+-------+----------+---------+----------+
-| epoch |  loss |  mae  |  mape | val_loss | val_mae | val_mape |
-+-------+-------+-------+-------+----------+---------+----------+
-|  199  | 4.335 | 1.707 | 1.441 |  3.741   |  1.533  |  0.359   |
-+-------+-------+-------+-------+----------+---------+----------+
-
-================================================================================2020-07-05 23:07:59
-{'step': 20, 'loss': 4.653, 'mae': 1.775, 'mape': 0.679}
-
- +-------+------+-------+-------+----------+---------+----------+
-| epoch | loss |  mae  |  mape | val_loss | val_mae | val_mape |
-+-------+------+-------+-------+----------+---------+----------+
-|  200  | 4.37 | 1.718 | 1.394 |  3.749   |  1.534  |  0.363   |
-+-------+------+-------+-------+----------+---------+----------+
-
-================================================================================2020-07-05 23:07:59
-Finished Training...
 ```
 
 ```python
@@ -232,7 +156,6 @@ plt.xlabel("x2")
 plt.ylabel("y",rotation = 0)
 
 plt.show()
-
 ```
 
 **4，评估模型**
@@ -240,8 +163,6 @@ plt.show()
 ```python
 dfhistory.tail()
 ```
-
-![](./data/3-3-dfhistory.png)
 
 ```python
 %matplotlib inline
@@ -260,34 +181,19 @@ def plot_metric(dfhistory, metric):
     plt.ylabel(metric)
     plt.legend(["train_"+metric, 'val_'+metric])
     plt.show()
-    
 ```
 
 ```python
 plot_metric(dfhistory,"loss")
 ```
 
-![](./data/3-3-loss曲线.png)
-
 ```python
 plot_metric(dfhistory,"mape")
 ```
 
-![](./data/3-3-mape曲线.png)
-
 ```python
 # 评估
 model.evaluate(dl_valid)
-```
-
-```
-{'val_loss': 3.749117374420166,
- 'val_mae': 1.5336137612660725,
- 'val_mape': 0.36319838215907413}
-```
-
-```python
-
 ```
 
 **5，使用模型**
@@ -298,39 +204,9 @@ dl = DataLoader(TensorDataset(X))
 model.predict(dl)[0:10]
 ```
 
-```
-tensor([[ 3.9212],
-        [ 8.6336],
-        [ 6.1982],
-        [ 6.1212],
-        [-5.0974],
-        [-6.3183],
-        [ 4.6588],
-        [ 5.5349],
-        [11.9106],
-        [24.6937]])
-```
-
 ```python
 # 预测
 model.predict(dl_valid)[0:10]
-```
-
-```
-tensor([[ 2.8368],
-        [16.2797],
-        [ 2.3135],
-        [ 9.5395],
-        [16.4363],
-        [10.0742],
-        [15.0864],
-        [12.9775],
-        [21.8568],
-        [21.8226]])
-```
-
-```python
-
 ```
 
 ### 二，DNN二分类模型
@@ -380,22 +256,14 @@ plt.figure(figsize = (6,6))
 plt.scatter(Xp[:,0],Xp[:,1],c = "r")
 plt.scatter(Xn[:,0],Xn[:,1],c = "g")
 plt.legend(["positive","negative"]);
-
 ```
-
-![](./data/3-3-分类数据可视化.png)
 
 ```python
 ds = TensorDataset(X,Y)
 
 ds_train,ds_valid = torch.utils.data.random_split(ds,[int(len(ds)*0.7),len(ds)-int(len(ds)*0.7)])
-dl_train = DataLoader(ds_train,batch_size = 100,shuffle=True,num_workers=2)
-dl_valid = DataLoader(ds_valid,batch_size = 100,num_workers=2)
-
-```
-
-```python
-
+dl_train = DataLoader(ds_train,batch_size = 100,shuffle=True,num_workers=40)
+dl_valid = DataLoader(ds_valid,batch_size = 100,num_workers=40)
 ```
 
 **2，定义模型**
@@ -422,7 +290,8 @@ class Model(torchkeras.LightModel):
         prediction = self(x)
         loss = nn.BCELoss()(prediction,y)
         preds = torch.where(prediction>0.5,torch.ones_like(prediction),torch.zeros_like(prediction))
-        acc = pl.metrics.functional.accuracy(preds, y)
+        acc = torch.mean(1-torch.abs(y-preds))
+#         acc = torchmetrics.Accuracy(preds, y)
         # attention: there must be a key of "loss" in the returned dict 
         dic = {"loss":loss,"acc":acc} 
         return dic
@@ -439,29 +308,7 @@ model = Model(net)
 
 
 torchkeras.summary(model,input_shape =(2,))
-
-
 ```
-
-```
-----------------------------------------------------------------
-        Layer (type)               Output Shape         Param #
-================================================================
-            Linear-1                    [-1, 4]              12
-            Linear-2                    [-1, 8]              40
-            Linear-3                    [-1, 1]               9
-================================================================
-Total params: 61
-Trainable params: 61
-Non-trainable params: 0
-----------------------------------------------------------------
-Input size (MB): 0.000008
-Forward/backward pass size (MB): 0.000099
-Params size (MB): 0.000233
-Estimated Total Size (MB): 0.000340
-----------------------------------------------------------------
-```
-
 
 **3，训练模型**
 
@@ -475,10 +322,9 @@ ckpt_cb = pl.callbacks.ModelCheckpoint(monitor='val_loss')
 # you can also set gpus = [0,1] to use the  given gpus
 # you can even set tpu_cores=2 to use two tpus 
 
-trainer = pl.Trainer(max_epochs=100,gpus = 0, callbacks=[ckpt_cb]) 
+trainer = pl.Trainer(max_epochs=10,gpus = [0], callbacks=[ckpt_cb] ) 
 
 trainer.fit(model,dl_train,dl_valid)
-
 ```
 
 ```
@@ -549,7 +395,6 @@ ax2.scatter(Xp_pred[:,0],Xp_pred[:,1],c = "r")
 ax2.scatter(Xn_pred[:,0],Xn_pred[:,1],c = "g")
 ax2.legend(["positive","negative"]);
 ax2.set_title("y_pred");
-
 ```
 
 ![](./data/3-3-分类结果可视化.png)
@@ -605,9 +450,6 @@ print(results[0])
 {'test_loss': 0.18403057754039764, 'test_acc': 0.949999988079071}
 ```
 
-```python
-
-```
 
 **5，使用模型**
 
@@ -634,9 +476,6 @@ tensor([[0.],
 
 ```
 
-```python
-
-```
 
 **如果本书对你有所帮助，想鼓励一下作者，记得给本项目加一颗星星star⭐️，并分享给你的朋友们喔😊!** 
 

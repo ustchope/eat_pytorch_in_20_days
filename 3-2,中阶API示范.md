@@ -1,3 +1,11 @@
+```python
+# 自动计算cell的计算时间
+%load_ext autotime
+
+%matplotlib inline
+%config InlineBackend.figure_format='svg' #矢量图设置，让绘图更清晰
+```
+
 # 3-2,中阶API示范
 
 下面的范例使用Pytorch的中阶API实现线性回归模型和和DNN二分类模型。
@@ -15,11 +23,6 @@ def printbar():
 
 #mac系统上pytorch和matplotlib在jupyter中同时跑需要更改环境变量
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE" 
-
-```
-
-```python
-
 ```
 
 ### 一，线性回归模型
@@ -44,7 +47,6 @@ X = 10*torch.rand([n,2])-5.0  #torch.rand是均匀分布
 w0 = torch.tensor([[2.0],[-3.0]])
 b0 = torch.tensor([[10.0]])
 Y = X@w0 + b0 + torch.normal( 0.0,2.0,size = [n,1])  # @表示矩阵乘法,增加正态扰动
-
 ```
 
 ```python
@@ -66,20 +68,12 @@ ax2.legend()
 plt.xlabel("x2")
 plt.ylabel("y",rotation = 0)
 plt.show()
-
 ```
-
-![](./data/3-2-线性回归数据可视化.png)
 
 ```python
 #构建输入数据管道
 ds = TensorDataset(X,Y)
 dl = DataLoader(ds,batch_size = 10,shuffle=True,num_workers=2)
-
-```
-
-```python
-
 ```
 
 **2，定义模型**
@@ -89,11 +83,6 @@ model = nn.Linear(2,1) #线性层
 
 model.loss_func = nn.MSELoss()
 model.optimizer = torch.optim.SGD(model.parameters(),lr = 0.01)
-
-```
-
-```python
-
 ```
 
 **3，训练模型**
@@ -111,8 +100,6 @@ def train_step(model, features, labels):
 # 测试train_step效果
 features,labels = next(iter(dl))
 train_step(model,features,labels)
-
-
 ```
 
 ```
@@ -132,33 +119,6 @@ def train_model(model,epochs):
             print("w =",w)
             print("b =",b)
 train_model(model,epochs = 200)
-
-```
-
-```
-================================================================================2020-07-05 22:51:53
-epoch = 50 loss =  3.0177409648895264
-w = tensor([[ 1.9315, -2.9573]])
-b = tensor([9.9625])
-
-================================================================================2020-07-05 22:51:57
-epoch = 100 loss =  2.1144354343414307
-w = tensor([[ 1.9760, -2.9398]])
-b = tensor([9.9428])
-
-================================================================================2020-07-05 22:52:01
-epoch = 150 loss =  3.290461778640747
-w = tensor([[ 2.1075, -2.9509]])
-b = tensor([9.9599])
-
-================================================================================2020-07-05 22:52:06
-epoch = 200 loss =  3.047853469848633
-w = tensor([[ 2.1134, -2.9306]])
-b = tensor([9.9722])
-```
-
-```python
-
 ```
 
 ```python
@@ -187,20 +147,10 @@ plt.xlabel("x2")
 plt.ylabel("y",rotation = 0)
 
 plt.show()
-
-```
-
-![](./data/3-2-回归结果可视化.png)
-
-```python
-
 ```
 
 ### 二， DNN二分类模型
 
-```python
-
-```
 
 **1，准备数据**
 
@@ -240,17 +190,12 @@ plt.figure(figsize = (6,6))
 plt.scatter(Xp[:,0],Xp[:,1],c = "r")
 plt.scatter(Xn[:,0],Xn[:,1],c = "g")
 plt.legend(["positive","negative"]);
-
 ```
-
-![](./data/3-2-分类数据可视化.png)
 
 ```python
 #构建输入数据管道
 ds = TensorDataset(X,Y)
 dl = DataLoader(ds,batch_size = 10,shuffle=True,num_workers=2)
-
-
 ```
 
 **2, 定义模型**
@@ -287,7 +232,6 @@ class DNNModel(nn.Module):
         return torch.optim.Adam(self.parameters(),lr = 0.001)
     
 model = DNNModel()
-
 ```
 
 ```python
@@ -300,16 +244,6 @@ metric = model.metric_func(predictions,labels)
 
 print("init loss:",loss.item())
 print("init metric:",metric.item())
-
-```
-
-```
-init loss: 0.7065666913986206
-init metric: 0.6000000238418579
-```
-
-```python
-
 ```
 
 **3，训练模型**
@@ -334,11 +268,6 @@ def train_step(model, features, labels):
 # 测试train_step效果
 features,labels = next(iter(dl))
 train_step(model,features,labels)
-
-```
-
-```
-(0.6048880815505981, 0.699999988079071)
 ```
 
 ```python
@@ -359,21 +288,6 @@ def train_model(model,epochs):
 train_model(model,epochs = 300)
 ```
 
-```
-================================================================================2020-07-05 22:56:38
-epoch = 100 loss =  0.23532892110607917 metric =  0.934749992787838
-
-================================================================================2020-07-05 22:58:18
-epoch = 200 loss =  0.24743918558603128 metric =  0.934999993443489
-
-================================================================================2020-07-05 22:59:56
-epoch = 300 loss =  0.2936080049697884 metric =  0.931499992609024
-```
-
-```python
-
-```
-
 ```python
 # 结果可视化
 fig, (ax1,ax2) = plt.subplots(nrows=1,ncols=2,figsize = (12,5))
@@ -389,13 +303,6 @@ ax2.scatter(Xp_pred[:,0],Xp_pred[:,1],c = "r")
 ax2.scatter(Xn_pred[:,0],Xn_pred[:,1],c = "g")
 ax2.legend(["positive","negative"]);
 ax2.set_title("y_pred");
-
-```
-
-![](./data/3-2-分类结果可视化.png)
-
-```python
-
 ```
 
 **如果本书对你有所帮助，想鼓励一下作者，记得给本项目加一颗星星star⭐️，并分享给你的朋友们喔😊!** 
