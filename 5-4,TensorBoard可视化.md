@@ -1,3 +1,23 @@
+```python
+# 自动计算cell的计算时间
+%load_ext autotime
+
+%matplotlib inline
+%config InlineBackend.figure_format='svg' #矢量图设置，让绘图更清晰
+```
+
+```bash
+
+# 增加更新
+git add *.md
+
+git remote -v
+
+git commit -m '更新 #4  Aug 20, 2021'
+
+git push origin master
+```
+
 # 5-4,TensorBoard可视化
 
 在我们的炼丹过程中，如果能够使用丰富的图像来展示模型的结构，指标的变化，参数的分布，输入的形态等信息，无疑会提升我们对问题的洞察力，并增加许多炼丹的乐趣。
@@ -25,9 +45,6 @@ Pytorch中利用TensorBoard可视化的大概过程如下：
 * 可视化人工绘图： writer.add_figure
 
 
-```python
-
-```
 
 ### 一，可视化模型结构
 
@@ -136,6 +153,10 @@ notebook.list()
 ```
 
 ```python
+!kill 113976
+```
+
+```python
 #启动tensorboard程序
 notebook.start("--logdir ./data/tensorboard")
 #等价于在命令行中执行 tensorboard --logdir ./data/tensorboard
@@ -144,9 +165,6 @@ notebook.start("--logdir ./data/tensorboard")
 
 ![](./data/5-4-graph结构.png)
 
-```python
-
-```
 
 ### 二，可视化指标变化
 
@@ -197,9 +215,6 @@ y= tensor(0.) ; x= tensor(1.0000)
 
 ![](./data/5-4-指标变化.png)
 
-```python
-
-```
 
 ### 三，可视化参数分布
 
@@ -225,15 +240,10 @@ for step,mean in enumerate(range(-10,10,1)):
     writer.add_histogram("w",w, step)
     writer.flush()
 writer.close()
-    
-
 ```
 
 ![](./data/5-4-张量分布.png)
 
-```python
-
-```
 
 ### 四，可视化原始图像
 
@@ -261,7 +271,6 @@ transform_train = transforms.Compose(
     [transforms.ToTensor()])
 transform_valid = transforms.Compose(
     [transforms.ToTensor()])
-
 ```
 
 ```python
@@ -296,19 +305,8 @@ writer.add_images("images",images,global_step = 0)
 writer.close()
 ```
 
-```
-{'0_airplane': 0, '1_automobile': 1}
-```
-
-```python
-
-```
-
 ![](./data/5-4-原始图像可视化.png)
 
-```python
-
-```
 
 ### 五，可视化人工绘图
 
@@ -359,8 +357,6 @@ for i in range(9):
     ax.set_yticks([]) 
 plt.show()
 ```
-
-![](./data/5-4-九宫格.png)
 
 ```python
 writer = SummaryWriter('./data/tensorboard')
