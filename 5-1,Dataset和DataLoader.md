@@ -1,3 +1,11 @@
+```python
+# 自动计算cell的计算时间
+%load_ext autotime
+
+%matplotlib inline
+%config InlineBackend.figure_format='svg' #矢量图设置，让绘图更清晰
+```
+
 # 5-1, Dataset和DataLoader
 
 Pytorch通常使用Dataset和DataLoader这两个工具类来构建数据管道。
@@ -11,9 +19,6 @@ DataLoader能够控制batch的大小，batch中元素的采样方法，以及将
 在绝大部分情况下，用户只需实现Dataset的`__len__`方法和`__getitem__`方法，就可以轻松构建自己的数据集，并用默认数据管道进行加载。
 
 
-```python
-
-```
 
 ### 一，Dataset和DataLoader概述
 
@@ -46,9 +51,6 @@ DataLoader能够控制batch的大小，batch中元素的采样方法，以及将
 `labels = torch.stack([Y[1],Y[4],Y[8],Y[9]])`
 
 
-```python
-
-```
 
 **2，Dataset和DataLoader的功能分工**
 
@@ -65,9 +67,6 @@ DataLoader能够控制batch的大小，batch中元素的采样方法，以及将
 
 第4个步骤的逻辑由DataLoader的参数`collate_fn`指定。一般情况下也无需用户设置。
 
-```python
-
-```
 
 **3，Dataset和DataLoader的主要接口**
 
@@ -101,11 +100,6 @@ class DataLoader(object):
         indices = next(self.sample_iter)
         batch = self.collate_fn([self.dataset[i] for i in indices])
         return batch
-    
-```
-
-```python
-
 ```
 
 ### 二，使用Dataset创建数据集
@@ -133,7 +127,6 @@ Dataset创建数据集常用的方法有：
 import numpy as np 
 import torch 
 from torch.utils.data import TensorDataset,Dataset,DataLoader,random_split 
-
 ```
 
 ```python
@@ -150,7 +143,6 @@ ds_train,ds_valid = random_split(ds_iris,[n_train,n_valid])
 
 print(type(ds_iris))
 print(type(ds_train))
-
 ```
 
 ```python
@@ -172,11 +164,6 @@ print('len(ds_valid) = ',len(ds_valid))
 print('len(ds_train+ds_valid) = ',len(ds_data))
 
 print(type(ds_data))
-
-```
-
-```python
-
 ```
 
 **2，根据图片目录创建图片数据集**
@@ -186,7 +173,6 @@ import numpy as np
 import torch 
 from torch.utils.data import DataLoader
 from torchvision import transforms,datasets 
-
 ```
 
 ```python
@@ -199,21 +185,15 @@ img = Image.open('./data/cat.jpeg')
 img
 ```
 
-![](./data/5-1-傻乎乎.png)
-
 ```python
 # 随机数值翻转
 transforms.RandomVerticalFlip()(img)
 ```
 
-![](./data/5-1-翻转.png)
-
 ```python
 #随机旋转
 transforms.RandomRotation(45)(img)
 ```
-
-![](./data/5-1-旋转.png)
 
 ```python
 # 定义图片增强操作
@@ -230,7 +210,6 @@ transform_valid = transforms.Compose([
     transforms.ToTensor()
   ]
 )
-
 ```
 
 ```python
@@ -238,14 +217,9 @@ transform_valid = transforms.Compose([
 ds_train = datasets.ImageFolder("./data/cifar2/train/",
             transform = transform_train,target_transform= lambda t:torch.tensor([t]).float())
 ds_valid = datasets.ImageFolder("./data/cifar2/test/",
-            transform = transform_train,target_transform= lambda t:torch.tensor([t]).float())
+            transform = transform_valid,target_transform= lambda t:torch.tensor([t]).float())
 
 print(ds_train.class_to_idx)
-
-```
-
-```
-{'0_airplane': 0, '1_automobile': 1}
 ```
 
 ```python
@@ -260,15 +234,6 @@ for features,labels in dl_train:
     print(features.shape)
     print(labels.shape)
     break
-```
-
-```
-torch.Size([50, 3, 32, 32])
-torch.Size([50, 1])
-```
-
-```python
-
 ```
 
 **3，创建自定义数据集**
@@ -331,11 +296,7 @@ df_word_dict["word_id"] = range(2,MAX_WORDS) #编号0和1分别留给未知词<u
 word_id_dict = df_word_dict["word_id"].to_dict()
 
 df_word_dict.head(10)
-
 ```
-
-![](./data/5-1-词典.png)
-
 
 然后我们利用构建好的词典，将文本转换成token序号。
 
@@ -364,7 +325,6 @@ def text_to_token(text_file,token_file):
         
 text_to_token(train_data_path,train_token_path)
 text_to_token(test_data_path,test_token_path)
-
 ```
 
 接着将token文本按照样本分割，每个文件存放一个样本的数据。
@@ -421,7 +381,6 @@ class imdbDataset(Dataset):
             label = torch.tensor([float(label)],dtype = torch.float)
             feature = torch.tensor([int(x) for x in tokens.split(" ")],dtype = torch.long)
             return  (feature,label)
-    
 ```
 
 ```python
@@ -434,11 +393,6 @@ print(len(ds_train))
 print(len(ds_test))
 ```
 
-```
-20000
-5000
-```
-
 ```python
 dl_train = DataLoader(ds_train,batch_size = BATCH_SIZE,shuffle = True,num_workers=4)
 dl_test = DataLoader(ds_test,batch_size = BATCH_SIZE,num_workers=4)
@@ -449,37 +403,6 @@ for features,labels in dl_train:
     break
 ```
 
-```
-tensor([[   1,    1,    1,  ...,   29,    8,    8],
-        [  13,   11,  247,  ...,    0,    0,    8],
-        [8587,  555,   12,  ...,    3,    0,    8],
-        ...,
-        [   1,    1,    1,  ...,    2,    0,    8],
-        [ 618,   62,   25,  ...,   20,  204,    8],
-        [   1,    1,    1,  ...,   71,   85,    8]])
-tensor([[1.],
-        [0.],
-        [0.],
-        [1.],
-        [0.],
-        [1.],
-        [0.],
-        [1.],
-        [1.],
-        [1.],
-        [0.],
-        [0.],
-        [0.],
-        [1.],
-        [0.],
-        [1.],
-        [1.],
-        [1.],
-        [0.],
-        [1.]])
-```
-
-
 最后构建模型测试一下数据集管道是否可用。
 
 ```python
@@ -487,6 +410,7 @@ import torch
 from torch import nn 
 import importlib 
 from torchkeras import Model,summary
+import torchkeras
 
 class Net(Model):
     
@@ -514,53 +438,18 @@ class Net(Model):
         y = self.dense(x)
         return y
         
-model = Net()
-print(model)
+net = Net()
+# print(model)
 
-model.summary(input_shape = (200,),input_dtype = torch.LongTensor)
+#model.summary(input_shape = (200,),input_dtype = torch.LongTensor)
 
-```
+#torchkeras.Model(net).summary((200,),input_dtype = torch.LongTensor)
 
-```
-Net(
-  (embedding): Embedding(10000, 3, padding_idx=1)
-  (conv): Sequential(
-    (conv_1): Conv1d(3, 16, kernel_size=(5,), stride=(1,))
-    (pool_1): MaxPool1d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
-    (relu_1): ReLU()
-    (conv_2): Conv1d(16, 128, kernel_size=(2,), stride=(1,))
-    (pool_2): MaxPool1d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
-    (relu_2): ReLU()
-  )
-  (dense): Sequential(
-    (flatten): Flatten()
-    (linear): Linear(in_features=6144, out_features=1, bias=True)
-    (sigmoid): Sigmoid()
-  )
-)
-----------------------------------------------------------------
-        Layer (type)               Output Shape         Param #
-================================================================
-         Embedding-1               [-1, 200, 3]          30,000
-            Conv1d-2              [-1, 16, 196]             256
-         MaxPool1d-3               [-1, 16, 98]               0
-              ReLU-4               [-1, 16, 98]               0
-            Conv1d-5              [-1, 128, 97]           4,224
-         MaxPool1d-6              [-1, 128, 48]               0
-              ReLU-7              [-1, 128, 48]               0
-           Flatten-8                 [-1, 6144]               0
-            Linear-9                    [-1, 1]           6,145
-          Sigmoid-10                    [-1, 1]               0
-================================================================
-Total params: 40,625
-Trainable params: 40,625
-Non-trainable params: 0
-----------------------------------------------------------------
-Input size (MB): 0.000763
-Forward/backward pass size (MB): 0.287796
-Params size (MB): 0.154972
-Estimated Total Size (MB): 0.443531
-----------------------------------------------------------------
+model = torchkeras.Model(net)
+model.summary((200,),input_dtype = torch.LongTensor)
+
+#model = nn.DataParallel(net, device_ids=[5,6])  #Attention this line!!!
+#model = torchkeras.Model(model)
 ```
 
 ```python
@@ -571,9 +460,9 @@ def accuracy(y_pred,y_true):
     acc = torch.mean(1-torch.abs(y_true-y_pred))
     return acc
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model.compile(loss_func = nn.BCELoss(),optimizer= torch.optim.Adagrad(model.parameters(),lr = 0.02),
              metrics_dict={"accuracy":accuracy})
-
 ```
 
 ```python
@@ -628,9 +517,6 @@ Finished Training...
 
 ```
 
-```python
-
-```
 
 ### 三，使用DataLoader加载数据集
 
@@ -691,14 +577,6 @@ dl = DataLoader(ds,
 for batch, in dl:
     print(batch)
 ```
-
-```
-tensor([43, 44, 21, 36,  9,  5, 28, 16, 20, 14])
-tensor([23, 49, 35, 38,  2, 34, 45, 18, 15, 40])
-tensor([26,  6, 27, 39,  8,  4, 24, 19, 32, 17])
-tensor([ 1, 29, 11, 47, 12, 22, 48, 42, 10,  7])
-```
-
 
 **如果本书对你有所帮助，想鼓励一下作者，记得给本项目加一颗星星star⭐️，并分享给你的朋友们喔😊!** 
 
